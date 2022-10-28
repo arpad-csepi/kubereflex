@@ -33,7 +33,7 @@ func Install(repositoryName string, chartName string, releaseName string, namesp
 	os.Setenv("HELM_NAMESPACE", namespace)
 
 	RepositoryUpdate()
-	installChart(releaseName, repositoryName, chartName, args)
+	installChart(releaseName, repositoryName, chartName, namespace, args)
 }
 
 // IsRepositoryExists check if given repositoryName already exists in repo.File
@@ -107,9 +107,9 @@ func RepositoryUpdate() {
 }
 
 // installChart perform a chart install
-func installChart(releaseName, repositoryName, chartName string, args map[string]string) {
+func installChart(releaseName, repositoryName, chartName string, namespace string, args map[string]string) {
 	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), debug); err != nil {
 		log.Fatal(err)
 	}
 	client := action.NewInstall(actionConfig)
@@ -150,9 +150,6 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	}
 
 	if req := chartRequested.Metadata.Dependencies; req != nil {
-		// If CheckDependencies returns an error, we have unfulfilled dependencies.
-		// As of Helm 2.4.0, this is treated as a stopping condition:
-		// https://github.com/helm/helm/issues/2209
 		if err := action.CheckDependencies(chartRequested, req); err != nil {
 			if client.DependencyUpdate {
 				manager := &downloader.Manager{
@@ -173,7 +170,7 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		}
 	}
 
-	client.Namespace = settings.Namespace()
+	client.Namespace = namespace
 	release, err := client.Run(chartRequested, vals)
 	if err != nil {
 		log.Fatal(err)
