@@ -42,7 +42,7 @@ func IsRepositoryExists(repositoryName string) bool {
 	var repoFile = readRepositoryFile(settings.RepositoryConfig)
 
 	if repoFile.Has(repositoryName) {
-		fmt.Printf("Nice! %s already in the repos!\n", repositoryName)
+		fmt.Printf("Nice! %s already in the repos!", repositoryName)
 		return true
 	}
 
@@ -103,7 +103,7 @@ func RepositoryUpdate() {
 		}(repository)
 	}
 	wg.Wait()
-	fmt.Printf("Alright! Update Complete. ⎈Happy Helming!⎈\n")
+	fmt.Printf("Alright! Update Complete. ⎈ Happy Helming! ⎈\n")
 }
 
 // installChart perform a chart install
@@ -123,6 +123,8 @@ func installChart(releaseName, repositoryName, chartName string, namespace strin
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	debug("CHART PATH: %s\n", chartPath)
 
 	getter.All(settings)
 
