@@ -28,10 +28,10 @@ import (
 
 var settings *cli.EnvSettings = cli.New()
 
-// Install perform repository updates and install the chart which is speficied
+// Install perform repository updates and install the chart which is specified
 func Install(repositoryName string, chartName string, releaseName string, namespace string, args map[string]string) {
 	os.Setenv("HELM_NAMESPACE", namespace)
-
+	settings.SetNamespace(namespace)
 	RepositoryUpdate()
 	installChart(releaseName, repositoryName, chartName, args)
 }
@@ -42,7 +42,7 @@ func IsRepositoryExists(repositoryName string) bool {
 	var repoFile = readRepositoryFile(settings.RepositoryConfig)
 
 	if repoFile.Has(repositoryName) {
-		fmt.Printf("Nice! %s already in the repos!", repositoryName)
+		fmt.Printf("Nice! %s already in the repos!\n", repositoryName)
 		return true
 	}
 
@@ -64,7 +64,7 @@ func RepositoryAdd(repositoryName, chartUrl string) {
 	}
 
 	if _, err := repository.DownloadIndexFile(); err != nil {
-		err := errors.Wrapf(err, "Ouch, looks like %q is not a valid chart repository or cannot be reached", chartUrl)
+		err := errors.Wrapf(err, "Ouch, looks like %q is not a valid chart repository or cannot be reached\n", chartUrl)
 		log.Fatal(err)
 	}
 
@@ -137,7 +137,7 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 
 	// Add args
 	if err := strvals.ParseInto(args["set"], vals); err != nil {
-		log.Fatal(errors.Wrap(err, "Nah, failed parsing --set data"))
+		log.Fatal(errors.Wrap(err, "Nah, failed parsing --set data\n"))
 	}
 
 	// Check chart dependencies to make sure all are present in /charts
@@ -152,9 +152,6 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	}
 
 	if req := chartRequested.Metadata.Dependencies; req != nil {
-		// If CheckDependencies returns an error, we have unfulfilled dependencies.
-		// As of Helm 2.4.0, this is treated as a stopping condition:
-		// https://github.com/helm/helm/issues/2209
 		if err := action.CheckDependencies(chartRequested, req); err != nil {
 			if client.DependencyUpdate {
 				manager := &downloader.Manager{
@@ -190,7 +187,7 @@ func isChartInstallable(chart *chart.Chart) (bool, error) {
 		return true, nil
 	}
 
-	return false, errors.Errorf("%s charts are not installable!", chart.Metadata.Type)
+	return false, errors.Errorf("%s charts are not installable!\n", chart.Metadata.Type)
 }
 
 // readRepositoryFile read repository file and return with that
