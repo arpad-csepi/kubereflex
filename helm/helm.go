@@ -36,20 +36,10 @@ func Install(repositoryName string, chartName string, releaseName string, namesp
 	installChart(releaseName, repositoryName, chartName, args)
 }
 
-func Uninstall(releaseName string) {
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
-		log.Fatal(err)
-	}
-	client := action.NewUninstall(actionConfig)
-
-	// TODO: Some check before run uninstall
-
-	release, err := client.Run(releaseName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(release.Info)
+func Uninstall(releaseName string, namespace string) {
+	os.Setenv("HELM_NAMESPACE", namespace)
+	settings.SetNamespace(namespace)
+	uninstallChart(releaseName)
 }
 
 // IsRepositoryExists check if given repositoryName already exists in repo.File
@@ -197,6 +187,22 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		log.Fatal(err)
 	}
 	fmt.Println(release.Manifest)
+}
+
+func uninstallChart(releaseName string) {
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+		log.Fatal(err)
+	}
+	client := action.NewUninstall(actionConfig)
+
+	// TODO: Some check before run uninstall
+
+	release, err := client.Run(releaseName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(release.Info)
 }
 
 // isChartInstallable check chart type is installable
