@@ -18,3 +18,9 @@ func InstallHelmChart(chartUrl string, repositoryName string, chartName string, 
 
 	helm.Install(repositoryName, chartName, releaseName, namespace, args)
 }
+
+func UninstallHelmChart(releaseName string) {
+	// TODO: Some check before run Uninstall
+
+	helm.Uninstall(releaseName)
+}

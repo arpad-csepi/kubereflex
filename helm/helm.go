@@ -36,6 +36,22 @@ func Install(repositoryName string, chartName string, releaseName string, namesp
 	installChart(releaseName, repositoryName, chartName, args)
 }
 
+func Uninstall(releaseName string) {
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+		log.Fatal(err)
+	}
+	client := action.NewUninstall(actionConfig)
+
+	// TODO: Some check before run uninstall
+
+	release, err := client.Run(releaseName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(release.Info)
+}
+
 // IsRepositoryExists check if given repositoryName already exists in repo.File
 func IsRepositoryExists(repositoryName string) bool {
 
@@ -172,8 +188,11 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		}
 	}
 
+	// BUG: cannot re-use a name that is still in use error when namespace exist (with no pods) from previous test run
+
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
+
 	if err != nil {
 		log.Fatal(err)
 	}
