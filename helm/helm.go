@@ -179,14 +179,13 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(release.Manifest)
 
 	// TODO: Maybe make optinional the verify process later
-	Verify(actionConfig, timeout)
+	Verify(timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -250,7 +249,12 @@ func readRepositoryFile(repositoryFile string) repo.File {
 
 // Verify check release status until the given time
 // TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
-func Verify(actionConfig *action.Configuration, timeout time.Duration) {
+func Verify(timeout time.Duration) {
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+		log.Fatal(err)
+	}
+
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
 		status := action.NewStatus(actionConfig)
