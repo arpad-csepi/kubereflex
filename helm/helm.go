@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/flock"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -21,19 +23,16 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
 	"helm.sh/helm/v3/pkg/strvals"
-
-	"github.com/gofrs/flock"
-	"github.com/pkg/errors"
 )
 
 var settings *cli.EnvSettings = cli.New()
 
 // Install perform repository updates and install the chart which is specified
-func Install(repositoryName string, chartName string, releaseName string, namespace string, args map[string]string) {
+func Install(repositoryName string, chartName string, releaseName string, namespace string, args map[string]string, timeout time.Duration) {
 	os.Setenv("HELM_NAMESPACE", namespace)
 	settings.SetNamespace(namespace)
 	RepositoryUpdate()
-	installChart(releaseName, repositoryName, chartName, args)
+	installChart(releaseName, repositoryName, chartName, args, timeout)
 }
 
 func Uninstall(releaseName string, namespace string) {
@@ -113,7 +112,7 @@ func RepositoryUpdate() {
 }
 
 // installChart perform a chart install
-func installChart(releaseName, repositoryName, chartName string, args map[string]string) {
+func installChart(releaseName, repositoryName, chartName string, args map[string]string, timeout time.Duration) {
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
 		log.Fatal(err)
@@ -178,8 +177,6 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		}
 	}
 
-	// BUG: cannot re-use a name that is still in use error when namespace exist (with no pods) from previous test run
-
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
 
@@ -187,6 +184,9 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		log.Fatal(err)
 	}
 	fmt.Println(release.Manifest)
+
+  // TODO: Maybe make optinional the verify process later
+  Verify(actionConfig, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -246,6 +246,31 @@ func readRepositoryFile(repositoryFile string) repo.File {
 	}
 
 	return repoFile
+}
+
+// Verify check release status until the given time
+// TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
+func Verify(actionConfig *action.Configuration, timeout time.Duration) {
+	status := action.NewStatus(actionConfig)
+
+	// TODO: Make timeout check event based for more efficiency
+	for start := time.Now(); ; {
+		release, err := status.Run(actionConfig.Releases.Name())
+		if err != nil {
+			// TODO: List the resources which cause the error
+			panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
+		}
+    if !release.Info.Status.IsPending() {
+      fmt.Println("Ok! Verify process was successful!")
+      break
+    }
+		if time.Since(start) > timeout {
+      // TODO: List the resources which cause the timeout
+      panic("Wait! Verify timeout was reached before the release status set to deployed!")
+		}
+
+    time.Sleep(1 * time.Second)
+	}
 }
 
 // debug is helpful for debug problems

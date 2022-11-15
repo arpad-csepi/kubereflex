@@ -1,13 +1,15 @@
 package kubereflex
 
 import (
+	"time"
+
 	helm "github.com/arpad-csepi/kubereflex/helm"
 	kubectl "github.com/arpad-csepi/kubereflex/kubectl"
 )
 
 // TODO: Optional parameters like args, namespace (maybe in KLI pass nil parameter to here)
 // TODO: Default value to namespace (maybe define defaults in KLI call this function)
-func InstallHelmChart(chartUrl string, repositoryName string, chartName string, releaseName string, namespace string, args map[string]string, kubeconfig *string) {
+func InstallHelmChart(chartUrl string, repositoryName string, chartName string, releaseName string, namespace string, args map[string]string, kubeconfig *string, timeout time.Duration) {
 	if !kubectl.IsNamespaceExists(namespace, kubeconfig) {
 		kubectl.CreateNamespace(namespace, kubeconfig)
 	}
@@ -16,7 +18,7 @@ func InstallHelmChart(chartUrl string, repositoryName string, chartName string, 
 		helm.RepositoryAdd(repositoryName, chartUrl)
 	}
 
-	helm.Install(repositoryName, chartName, releaseName, namespace, args)
+	helm.Install(repositoryName, chartName, releaseName, namespace, args, timeout)
 }
 
 func UninstallHelmChart(releaseName string, namespace string) {
