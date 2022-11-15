@@ -256,7 +256,7 @@ func Verify(actionConfig *action.Configuration, timeout time.Duration) {
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
 		release, err := status.Run(actionConfig.Releases.Name())
-		if err != nil {
+		if err == nil {
 			// TODO: List the resources which cause the error
 			panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
 		}
