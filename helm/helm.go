@@ -179,13 +179,14 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(release.Manifest)
 
-	// TODO: Maybe make optinional the verify process later
-	Verify(timeout)
+  // TODO: Maybe make optinional the verify process later
+  Verify(actionConfig, releaseName, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -249,30 +250,26 @@ func readRepositoryFile(repositoryFile string) repo.File {
 
 // Verify check release status until the given time
 // TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
-func Verify(timeout time.Duration) {
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
-		log.Fatal(err)
-	}
+func Verify(actionConfig *action.Configuration, releaseName string, timeout time.Duration) {
+	status := action.NewStatus(actionConfig)
 
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
-		status := action.NewStatus(actionConfig)
-		release, err := status.Run(actionConfig.Releases.Name())
+		release, err := status.Run(releaseName)
 		if err == nil {
 			// TODO: List the resources which cause the error
 			panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
 		}
-		if !release.Info.Status.IsPending() {
-			fmt.Println("Ok! Verify process was successful!")
-			break
-		}
+    if !release.Info.Status.IsPending() {
+      fmt.Println("Ok! Verify process was successful!")
+      break
+    }
 		if time.Since(start) > timeout {
-			// TODO: List the resources which cause the timeout
-			panic("Wait! Verify timeout was reached before the release status set to deployed!")
+      // TODO: List the resources which cause the timeout
+      panic("Wait! Verify timeout was reached before the release status set to deployed!")
 		}
 
-		time.Sleep(1 * time.Second)
+    time.Sleep(1 * time.Second)
 	}
 }
 
