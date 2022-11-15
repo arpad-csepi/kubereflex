@@ -185,8 +185,8 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	}
 	fmt.Println(release.Manifest)
 
-  // TODO: Maybe make optinional the verify process later
-  Verify(actionConfig, timeout)
+	// TODO: Maybe make optinional the verify process later
+	Verify(actionConfig, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -251,25 +251,24 @@ func readRepositoryFile(repositoryFile string) repo.File {
 // Verify check release status until the given time
 // TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
 func Verify(actionConfig *action.Configuration, timeout time.Duration) {
-	status := action.NewStatus(actionConfig)
-
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
+		status := action.NewStatus(actionConfig)
 		release, err := status.Run(actionConfig.Releases.Name())
 		if err == nil {
 			// TODO: List the resources which cause the error
 			panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
 		}
-    if !release.Info.Status.IsPending() {
-      fmt.Println("Ok! Verify process was successful!")
-      break
-    }
+		if !release.Info.Status.IsPending() {
+			fmt.Println("Ok! Verify process was successful!")
+			break
+		}
 		if time.Since(start) > timeout {
-      // TODO: List the resources which cause the timeout
-      panic("Wait! Verify timeout was reached before the release status set to deployed!")
+			// TODO: List the resources which cause the timeout
+			panic("Wait! Verify timeout was reached before the release status set to deployed!")
 		}
 
-    time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }
 
