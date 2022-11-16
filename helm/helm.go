@@ -186,8 +186,8 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	}
 	fmt.Println(release.Manifest)
 
-  // TODO: Maybe make optinional the verify process later
-  Verify(release, timeout)
+	// TODO: Maybe make optinional the verify process later
+	Verify(release, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -254,16 +254,18 @@ func readRepositoryFile(repositoryFile string) repo.File {
 func Verify(release *release.Release, timeout time.Duration) {
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
-    if !release.Info.Status.IsPending() {
-      fmt.Println("Ok! Verify process was successful!")
-      break
-    }
+		fmt.Println(release.Info.Status)
+		if !release.Info.Status.IsPending() {
+			fmt.Println("Ok! Verify process was successful!")
+			break
+		}
 		if time.Since(start) > timeout {
-      // TODO: List the resources which cause the timeout
-      panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
+			// TODO: List the resources which cause the timeout
+			fmt.Println("Aww. One or more resource is not ready! Please check your cluster to more info.")
+			break
 		}
 
-    time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 }
 
