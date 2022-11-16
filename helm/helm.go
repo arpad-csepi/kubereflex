@@ -21,6 +21,7 @@ import (
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	"helm.sh/helm/v3/pkg/strvals"
 )
@@ -186,7 +187,7 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	fmt.Println(release.Manifest)
 
   // TODO: Maybe make optinional the verify process later
-  Verify(actionConfig, releaseName, timeout)
+  Verify(release, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -250,23 +251,16 @@ func readRepositoryFile(repositoryFile string) repo.File {
 
 // Verify check release status until the given time
 // TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
-func Verify(actionConfig *action.Configuration, releaseName string, timeout time.Duration) {
-	status := action.NewStatus(actionConfig)
-
+func Verify(release *release.Release, timeout time.Duration) {
 	// TODO: Make timeout check event based for more efficiency
 	for start := time.Now(); ; {
-		release, err := status.Run(releaseName)
-		if err == nil {
-			// TODO: List the resources which cause the error
-			panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
-		}
     if !release.Info.Status.IsPending() {
       fmt.Println("Ok! Verify process was successful!")
       break
     }
 		if time.Since(start) > timeout {
       // TODO: List the resources which cause the timeout
-      panic("Wait! Verify timeout was reached before the release status set to deployed!")
+      panic("Aww. One or more resource is not ready! Please check your cluster to more info.")
 		}
 
     time.Sleep(1 * time.Second)
