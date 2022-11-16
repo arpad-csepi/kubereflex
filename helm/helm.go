@@ -21,7 +21,6 @@ import (
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/downloader"
 	"helm.sh/helm/v3/pkg/getter"
-	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	"helm.sh/helm/v3/pkg/strvals"
 )
@@ -185,9 +184,6 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 		log.Fatal(err)
 	}
 	fmt.Println(release.Manifest)
-
-	// TODO: Maybe make optinional the verify process later
-	Verify(release, timeout)
 }
 
 func uninstallChart(releaseName string) {
@@ -247,36 +243,6 @@ func readRepositoryFile(repositoryFile string) repo.File {
 	}
 
 	return repoFile
-}
-
-// Verify check release status until the given time
-// TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
-func Verify(release *release.Release, timeout time.Duration) {
-	// TODO: Make timeout check event based for more efficiency
-	var animation = [12]string{"_", "_", "_", "-", "`", "`", "'", "´", "-", "_", "_", "_"}
-	var frame = 0
-	fmt.Printf("Verifing the installation: ")
-	for start := time.Now(); ; {
-		fmt.Print(animation[frame])
-		if !release.Info.Status.IsPending() {
-			fmt.Println("\nOk! Verify process was successful!")
-			break
-		}
-		if time.Since(start) > timeout {
-			// TODO: List the resources which cause the timeout
-			fmt.Println("\nAww. One or more resource is not ready! Please check your cluster to more info.")
-			break
-		}
-		time.Sleep(500 * time.Millisecond)
-		fmt.Print("\033[G") // Move cursor left
-
-		// TODO: Fix this loop with 1 line formula later
-		if frame == 11 {
-			frame = 0
-		} else {
-			frame += 1
-		}
-	}
 }
 
 // debug is helpful for debug problems
