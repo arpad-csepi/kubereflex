@@ -259,12 +259,12 @@ func Verify(release *release.Release, timeout time.Duration) {
 	for start := time.Now(); ; {
 		fmt.Print(animation[frame])
 		if !release.Info.Status.IsPending() {
-			fmt.Println("Ok! Verify process was successful!")
+			fmt.Println("\nOk! Verify process was successful!")
 			break
 		}
 		if time.Since(start) > timeout {
 			// TODO: List the resources which cause the timeout
-			fmt.Println("Aww. One or more resource is not ready! Please check your cluster to more info.")
+			fmt.Println("\nAww. One or more resource is not ready! Please check your cluster to more info.")
 			break
 		}
 		time.Sleep(500 * time.Millisecond)
@@ -275,7 +275,7 @@ func Verify(release *release.Release, timeout time.Duration) {
 			frame = 0
 		} else {
 			frame += 1
-		}	
+		}
 	}
 }
 
