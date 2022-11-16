@@ -253,8 +253,11 @@ func readRepositoryFile(repositoryFile string) repo.File {
 // TODO: Make this asynchronous so other resources can be installed while verify is running (if not dependent one resource on another)
 func Verify(release *release.Release, timeout time.Duration) {
 	// TODO: Make timeout check event based for more efficiency
+	var animation = [12]string{"_", "_", "_", "-", "`", "`", "'", "´", "-", "_", "_", "_"}
+	var frame = 0
+	fmt.Printf("Verifing the installation: ")
 	for start := time.Now(); ; {
-		fmt.Println(release.Info.Status)
+		fmt.Print(animation[frame])
 		if !release.Info.Status.IsPending() {
 			fmt.Println("Ok! Verify process was successful!")
 			break
@@ -264,8 +267,15 @@ func Verify(release *release.Release, timeout time.Duration) {
 			fmt.Println("Aww. One or more resource is not ready! Please check your cluster to more info.")
 			break
 		}
+		time.Sleep(500 * time.Millisecond)
+		fmt.Print("\033[G") // Move cursor left
 
-		time.Sleep(1 * time.Second)
+		// TODO: Fix this loop with 1 line formula later
+		if frame == 11 {
+			frame = 0
+		} else {
+			frame += 1
+		}	
 	}
 }
 
