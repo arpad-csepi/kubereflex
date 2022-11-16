@@ -28,11 +28,11 @@ import (
 var settings *cli.EnvSettings = cli.New()
 
 // Install perform repository updates and install the chart which is specified
-func Install(repositoryName string, chartName string, releaseName string, namespace string, args map[string]string, timeout time.Duration) {
+func Install(repositoryName string, chartName string, releaseName string, namespace string, args map[string]string) {
 	os.Setenv("HELM_NAMESPACE", namespace)
 	settings.SetNamespace(namespace)
 	RepositoryUpdate()
-	installChart(releaseName, repositoryName, chartName, args, timeout)
+	installChart(releaseName, repositoryName, chartName, args)
 }
 
 func Uninstall(releaseName string, namespace string) {
@@ -112,7 +112,7 @@ func RepositoryUpdate() {
 }
 
 // installChart perform a chart install
-func installChart(releaseName, repositoryName, chartName string, args map[string]string, timeout time.Duration) {
+func installChart(releaseName, repositoryName, chartName string, args map[string]string) {
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
 		log.Fatal(err)
