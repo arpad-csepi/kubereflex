@@ -67,9 +67,9 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 	// TODO: Make timeout check event based for more efficiency
 	var animation = [7]string{"_", "-", "`", "'", "´", "-", "_"}
 	var frame = 0
-	fmt.Printf("Verifing the installation: ")
+
 	for start := time.Now(); ; {
-		fmt.Print(animation[frame])
+		fmt.Printf("Verifing the installation: [%s]", animation[frame])
 		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
 		if err != nil {
 			panic(err.Error())
