@@ -69,7 +69,7 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 	var frame = 0
 
 	for start := time.Now(); ; {
-		fmt.Printf("Verifing the installation: [%s]", animation[frame])
+		fmt.Printf("Verifing the %s deployment: [%s]", deploymentName, animation[frame])
 		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
 		if err != nil {
 			panic(err.Error())
