@@ -183,7 +183,7 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(release.Manifest)
+	fmt.Printf("%s is deployed\n", release.Name)
 
 	// TODO: return some information about the release for the Verify function in kubectl to find out the deployment exact name
 }
