@@ -74,7 +74,7 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 		if err != nil {
 			panic(err.Error())
 		}
-		if deployment.Status.UnavailableReplicas == 0 {
+		if deployment.Status.Replicas == deployment.Status.ReadyReplicas {
 			fmt.Println("\nOk! Verify process was successful!")
 			break
 		}
