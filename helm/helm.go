@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/flock"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
@@ -21,9 +23,6 @@ import (
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
 	"helm.sh/helm/v3/pkg/strvals"
-
-	"github.com/gofrs/flock"
-	"github.com/pkg/errors"
 )
 
 var settings *cli.EnvSettings = cli.New()
@@ -34,6 +33,12 @@ func Install(repositoryName string, chartName string, releaseName string, namesp
 	settings.SetNamespace(namespace)
 	RepositoryUpdate()
 	installChart(releaseName, repositoryName, chartName, args)
+}
+
+func Uninstall(releaseName string, namespace string) {
+	os.Setenv("HELM_NAMESPACE", namespace)
+	settings.SetNamespace(namespace)
+	uninstallChart(releaseName)
 }
 
 // IsRepositoryExists check if given repositoryName already exists in repo.File
@@ -174,10 +179,29 @@ func installChart(releaseName, repositoryName, chartName string, args map[string
 
 	client.Namespace = settings.Namespace()
 	release, err := client.Run(chartRequested, vals)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(release.Manifest)
+	fmt.Printf("%s is deployed\n", release.Name)
+
+	// TODO: return some information about the release for the Verify function in kubectl to find out the deployment exact name
+}
+
+func uninstallChart(releaseName string) {
+	actionConfig := new(action.Configuration)
+	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), debug); err != nil {
+		log.Fatal(err)
+	}
+	client := action.NewUninstall(actionConfig)
+
+	// TODO: Some check before run uninstall
+
+	release, err := client.Run(releaseName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(release.Info)
 }
 
 // isChartInstallable check chart type is installable

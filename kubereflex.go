@@ -1,6 +1,8 @@
 package kubereflex
 
 import (
+	"time"
+
 	helm "github.com/arpad-csepi/kubereflex/helm"
 	kubectl "github.com/arpad-csepi/kubereflex/kubectl"
 )
@@ -17,4 +19,14 @@ func InstallHelmChart(chartUrl string, repositoryName string, chartName string, 
 	}
 
 	helm.Install(repositoryName, chartName, releaseName, namespace, args)
+}
+
+func UninstallHelmChart(releaseName string, namespace string) {
+	// TODO: Some check before run Uninstall
+
+	helm.Uninstall(releaseName, namespace)
+}
+
+func Verify(deploymentName string, namespace string, kubeconfig *string, timeout time.Duration) {
+	kubectl.Verify(deploymentName, namespace, kubeconfig, timeout)
 }
