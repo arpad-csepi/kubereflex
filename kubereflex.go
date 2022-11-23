@@ -4,7 +4,6 @@ import (
 	"time"
 
 	helm "github.com/arpad-csepi/kubereflex/helm"
-	"github.com/arpad-csepi/kubereflex/io"
 	kubectl "github.com/arpad-csepi/kubereflex/kubectl"
 )
 
@@ -32,6 +31,6 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 	kubectl.Verify(deploymentName, namespace, kubeconfig, timeout)
 }
 
-func ReadYAMLResourceFile(path string) {
-	io.ReadYAMLResourceFile(path)
+func Apply(path string, kubeconfig *string) {
+	kubectl.Apply(path, kubeconfig)
 }

@@ -15,13 +15,15 @@ func fileRead(path string) []byte {
 	return data
 }
 
-func ReadYAMLResourceFile(path string) {
+func ReadYAMLResourceFile(path string) banzaicloud.IstioControlPlane {
 	var data = fileRead(path)
-	var ControlPlane banzaicloud.IstioControlPlane
-	err := yaml.Unmarshal(data, ControlPlane)
+	var controlPlane banzaicloud.IstioControlPlane
+	err := yaml.Unmarshal(data, controlPlane)
 	if err != nil {
 		panic("Aww, this resource file cannot convert to IstioControlPlane resource")
 	}
+
+	return controlPlane
 }
 
 func ReadYAMLChartsFile(path string) {

@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-
+	"github.com/arpad-csepi/kubereflex/io"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/cli-runtime/pkg/resource"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 // setKubeClient set up kubernetes clientset from the given kubeconfig and return with that
@@ -93,4 +96,28 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 			frame += 1
 		}
 	}
+}
+
+func Apply(path string, kubeconfig *string) {
+	var clientset = setKubeClient(kubeconfig)
+	var controlPlane = io.ReadYAMLResourceFile(path)
+
+	groupResources, err := restmapper.GetAPIGroupResources(clientset.Discovery())
+    if err != nil {
+        panic(err)
+    }
+	mapper := restmapper.NewDiscoveryRESTMapper(groupResources)
+
+	// Get some metadata needed to make the REST request.
+	gvk := controlPlane.GetObjectKind().GroupVersionKind()
+	gk := schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}
+
+	mapping, err := mapper.RESTMapping(gk, gvk.Version)
+    if err != nil {
+        panic(err)
+    }
+
+	helper := resource.NewHelper(clientset.RESTClient(), mapping)
+
+	helper.Create(controlPlane.Namespace, false, &controlPlane)
 }
