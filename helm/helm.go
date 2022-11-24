@@ -3,7 +3,6 @@ package helm
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,7 +12,7 @@ import (
 
 	"github.com/gofrs/flock"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -234,7 +233,7 @@ func readRepositoryFile(repositoryFile string) repo.File {
 		log.Fatal(err)
 	}
 
-	file, err := ioutil.ReadFile(repositoryFile)
+	file, err := os.ReadFile(repositoryFile)
 	if err != nil && !os.IsNotExist(err) {
 		log.Fatal(err)
 	}
