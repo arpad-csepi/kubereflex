@@ -9,7 +9,7 @@ require (
 	github.com/gofrs/flock v0.8.1
 	github.com/pkg/errors v0.9.1
 	gopkg.in/yaml.v2 v2.4.0
-	helm.sh/helm/v3 v3.9.4
+	helm.sh/helm/v3 v3.10.2
 	k8s.io/api v0.25.4
 	k8s.io/apimachinery v0.25.4
 	k8s.io/cli-runtime v0.25.4
@@ -130,7 +130,7 @@ require (
 	k8s.io/component-base v0.25.4 // indirect
 	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20221123214604-86e75ddd809a // indirect
-	k8s.io/kubectl v0.25.0-alpha.3 // indirect
+	k8s.io/kubectl v0.25.2 // indirect
 	k8s.io/utils v0.0.0-20221108210102-8e77b1f39fe2 // indirect
 	oras.land/oras-go v1.2.1 // indirect
 	sigs.k8s.io/controller-runtime v0.13.1 // indirect
