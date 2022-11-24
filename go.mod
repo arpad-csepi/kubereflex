@@ -4,7 +4,7 @@ go 1.18
 
 replace github.com/golang/protobuf => github.com/luciferinlove/protobuf v0.0.0-20220913214010-c63936d75066
 
-replace sigs.k8s.io/kustomize/api => sigs.k8s.io/kustomize/api v0.0.0-20220802160752-8bd05aa588f3
+replace sigs.k8s.io/kustomize/api => sigs.k8s.io/kustomize/api v0.0.0-20221117175717-91a2c2b1a489
 
 require (
 	github.com/banzaicloud/istio-operator/api/v2 v2.16.0
@@ -260,7 +260,7 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.3.3 // indirect
-	istio.io/api v0.0.0-20221123151324-030674c61a8b // indirect
+	istio.io/api v0.0.0-20221124135806-a39e7047c3ca // indirect
 	k8s.io/apiextensions-apiserver v0.25.4 // indirect
 	k8s.io/apiserver v0.25.4 // indirect
 	k8s.io/component-base v0.25.4 // indirect
