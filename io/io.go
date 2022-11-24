@@ -5,7 +5,7 @@ import (
 	"os"
 
 	banzaicloud "github.com/banzaicloud/istio-operator/api/v2/v1alpha1"
-	"gopkg.in/yaml.v2"
+	"sigs.k8s.io/yaml"
 )
 
 func fileRead(path string) []byte {
