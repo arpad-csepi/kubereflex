@@ -12,7 +12,7 @@ require (
 	helm.sh/helm/v3 v3.9.4
 	k8s.io/api v0.25.4
 	k8s.io/apimachinery v0.25.4
-	k8s.io/cli-runtime v0.25.0-alpha.3
+	k8s.io/cli-runtime v0.25.4
 	k8s.io/client-go v0.25.4
 )
 
@@ -135,7 +135,7 @@ require (
 	oras.land/oras-go v1.2.1 // indirect
 	sigs.k8s.io/controller-runtime v0.13.1 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
-	sigs.k8s.io/kustomize/api v0.12.0 // indirect
+	sigs.k8s.io/kustomize/api v0.12.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.10 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
