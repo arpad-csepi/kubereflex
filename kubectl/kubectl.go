@@ -100,7 +100,7 @@ func Verify(deploymentName string, namespace string, kubeconfig *string, timeout
 
 func Apply(path string, kubeconfig *string) {
 	var clientset = setKubeClient(kubeconfig)
-	var controlPlane = io.ReadJSONResourceFile(path)
+	var controlPlane = io.ReadYAMLResourceFile(path)
 
 	groupResources, err := restmapper.GetAPIGroupResources(clientset.Discovery())
     if err != nil {
