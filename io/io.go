@@ -9,7 +9,7 @@ import (
 )
 
 func fileRead(path string) []byte {
-	data, err := os.ReadFile("/tmp/dat")
+	data, err := os.ReadFile(path)
     if err != nil {
 		panic("Nope, file not found")
 	}
