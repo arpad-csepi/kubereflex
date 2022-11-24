@@ -2,6 +2,8 @@ module github.com/arpad-csepi/kubereflex
 
 go 1.18
 
+replace github.com/golang/protobuf => github.com/luciferinlove/protobuf v0.0.0-20220913214010-c63936d75066
+
 require (
 	github.com/gofrs/flock v0.8.1
 	github.com/pkg/errors v0.9.1

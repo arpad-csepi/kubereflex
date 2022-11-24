@@ -1,9 +1,11 @@
 package io
 
 import (
+	"encoding/json"
 	"os"
-	"gopkg.in/yaml.v2"
+
 	banzaicloud "github.com/banzaicloud/istio-operator/api/v2/v1alpha1"
+	"gopkg.in/yaml.v2"
 )
 
 func fileRead(path string) []byte {
@@ -19,6 +21,18 @@ func ReadYAMLResourceFile(path string) banzaicloud.IstioControlPlane {
 	var data = fileRead(path)
 	var controlPlane banzaicloud.IstioControlPlane
 	err := yaml.Unmarshal(data, controlPlane)
+	if err != nil {
+		panic("Aww, this resource file cannot convert to IstioControlPlane resource")
+	}
+
+	return controlPlane
+}
+
+func ReadJSONResourceFile(path string) banzaicloud.IstioControlPlane {
+	var data = fileRead(path)
+	var controlPlane banzaicloud.IstioControlPlane
+
+	err := json.Unmarshal(data, &controlPlane)
 	if err != nil {
 		panic("Aww, this resource file cannot convert to IstioControlPlane resource")
 	}
