@@ -7,7 +7,7 @@ replace github.com/golang/protobuf => github.com/luciferinlove/protobuf v0.0.0-2
 replace sigs.k8s.io/kustomize/api => sigs.k8s.io/kustomize/api v0.0.0-20221117175717-91a2c2b1a489
 
 require (
-	github.com/banzaicloud/istio-operator/api/v2 v2.16.0
+	github.com/banzaicloud/istio-operator/api/v2 v2.15.3
 	github.com/gofrs/flock v0.8.1
 	github.com/pkg/errors v0.9.1
 	helm.sh/helm/v3 v3.10.2
