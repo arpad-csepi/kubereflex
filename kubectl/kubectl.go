@@ -103,9 +103,9 @@ func Apply(path string, kubeconfig *string) {
 	var controlPlane = io.ReadYAMLResourceFile(path)
 
 	groupResources, err := restmapper.GetAPIGroupResources(clientset.Discovery())
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 	mapper := restmapper.NewDiscoveryRESTMapper(groupResources)
 
 	// Get some metadata needed to make the REST request.
@@ -113,11 +113,14 @@ func Apply(path string, kubeconfig *string) {
 	gk := schema.GroupKind{Group: gvk.Group, Kind: gvk.Kind}
 
 	mapping, err := mapper.RESTMapping(gk, gvk.Version)
-    if err != nil {
-        panic(err)
-    }
+	if err != nil {
+		panic(err)
+	}
 
-	helper := resource.NewHelper(clientset.RESTClient(), mapping)
+	helper := resource.NewHelper(clientset.CoreV1().RESTClient(), mapping)
 
-	helper.Create(controlPlane.Namespace, false, &controlPlane)
+	_, err = helper.Create(controlPlane.Namespace, false, &controlPlane)
+	if err != nil {
+		panic(err)
+	}
 }
